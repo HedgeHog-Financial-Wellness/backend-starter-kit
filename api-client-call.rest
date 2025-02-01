@@ -1,0 +1,22 @@
+
+@protocol = http
+@hostname = localhost
+@port = 4444
+@host = {{protocol}}://{{hostname}}:{{port}}
+@contentType = application/json
+
+### HOME ROUTE
+GET {{host}}
+###
+
+### OPENAPI ROUTE
+GET {{host}}/doc
+###
+
+### NOT FOUND ROUTE
+GET {{host}}/not-found-route
+###
+
+### TASKS ROUTE: LIST
+GET {{host}}/tasks
+###

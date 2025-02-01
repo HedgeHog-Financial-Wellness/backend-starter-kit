@@ -1,0 +1,15 @@
+version: "3"
+services:
+  database:
+    image: postgres:16
+    container_name: backend-starter-kit-db-local
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: "hedgehog"
+      POSTGRES_PASSWORD: "hedgehog"
+      POSTGRES_DB: "hedgehog"
+    volumes:
+      - backend-starter-kit-db-local-vol:/var/lib/postgresql/data
+volumes:
+    backend-starter-kit-db-local-vol:
