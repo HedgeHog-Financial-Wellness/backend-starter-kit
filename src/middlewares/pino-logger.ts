@@ -14,3 +14,6 @@ export function pinoLogger() {
     },
   });
 }
+export const systemLogger = pino({
+  level: env.LOG_LEVEL,
+});

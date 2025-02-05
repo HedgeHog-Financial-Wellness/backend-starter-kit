@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import router from "./tasks.index.js";
 import { createTestApp } from "@/lib/create-app.js";
 
-describe("Tasks List", () => {
+import router from "./tasks.index.js";
+
+describe("tasks List", () => {
   it("should return a list of tasks", async () => {
     const testApp = createTestApp(router);
     const response = await testApp.request("/tasks");
