@@ -1,6 +1,6 @@
 import { createRoute } from "@hono/zod-openapi";
 
-import { createIdeaSchemaReqBody, createIdeaSchemaResBody } from "@/db/schema.js";
+import { createIdeaSchemaReqBody, createIdeaSchemaResBody } from "@/db/schema/ideas.js";
 import * as HTTP_STATUS_CODES from "@/framework/hono/http-status-codes.js";
 import jsonContent from "@/framework/hono/openapi/helpers/json-content.js";
 

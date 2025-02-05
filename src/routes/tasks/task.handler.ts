@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import type { AppRouteHandler } from "@/lib/types.js";
 
 import db from "@/db/index.js";
-import { tasksTable } from "@/db/schema.js";
+import { tasksTable } from "@/db/schema/tasks.js";
 import * as HTTP_STATUS_CODES from "@/framework/hono/http-status-codes.js";
 import * as HTTP_STATUS_PHRASES from "@/framework/hono/http-status-phrases.js";
 
@@ -16,7 +16,7 @@ import type {
 } from "./task.routes.js";
 
 export const list: AppRouteHandler<ListRoute> = async (c) => {
-  const tasks = await db.query.tasksTable.findMany();
+  const tasks = await db.select().from(tasksTable);
   c.var.logger.info("Listing tasks");
   return c.json(tasks);
 };
@@ -28,12 +28,14 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
 };
 
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
-  const task = await db.query.tasksTable.findFirst({
-    where: eq(tasksTable.id, Number(c.req.param("id"))),
-  });
+  const [task] = await db.select()
+    .from(tasksTable)
+    .where(eq(tasksTable.id, Number(c.req.param("id"))));
+
   if (!task) {
     return c.json({ message: "Task not found" }, HTTP_STATUS_CODES.NOT_FOUND);
   }
+
   return c.json(task, HTTP_STATUS_CODES.OK);
 };
 

@@ -1,6 +1,6 @@
 import { createRoute, z } from "@hono/zod-openapi";
 
-import { createTaskSchema, patchTaskSchema, selectTasksSchema } from "@/db/schema.js";
+import { createTaskSchema, patchTaskSchema, selectTasksSchema } from "@/db/schema/tasks.js";
 import * as HTTP_STATUS_CODES from "@/framework/hono/http-status-codes.js";
 import jsonContentOneOf from "@/framework/hono/openapi/helpers/json-content-one-of.js";
 import jsonContentRequired from "@/framework/hono/openapi/helpers/json-content-required.js";
