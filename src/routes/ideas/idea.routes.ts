@@ -1,6 +1,7 @@
 import { createRoute } from "@hono/zod-openapi";
+import { z } from "zod";
 
-import { createIdeaSchemaReqBody, createIdeaSchemaResBody } from "@/db/schema/ideas.js";
+import { createIdeaSchemaReqBody, createIdeaSchemaResBody, listIdeasSchemaResBody } from "@/db/schema/ideas.js";
 import * as HTTP_STATUS_CODES from "@/framework/hono/http-status-codes.js";
 import jsonContent from "@/framework/hono/openapi/helpers/json-content.js";
 
@@ -31,4 +32,15 @@ const create = createRoute({
 
 export type CreateRoute = typeof create;
 
-export { create };
+const list = createRoute({
+  path: "/ideas",
+  method: "get",
+  tags,
+  responses: {
+    [HTTP_STATUS_CODES.OK]: jsonContent(z.array(listIdeasSchemaResBody), "The ideas list"),
+  },
+});
+
+export type ListRoute = typeof list;
+
+export { create, list };

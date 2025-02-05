@@ -1,5 +1,5 @@
 import { integer, pgEnum, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const ideaStatusEnum = pgEnum("idea_status", ["draft", "voting", "done"]);
 // ideas table
@@ -40,3 +40,7 @@ export const createIdeaSchemaResBody = createInsertSchema(ideasTable)
     createdAt: true,
     updatedAt: true,
   });
+
+export const listIdeasSchemaResBody = createSelectSchema(ideasTable).omit({
+  id: true,
+});

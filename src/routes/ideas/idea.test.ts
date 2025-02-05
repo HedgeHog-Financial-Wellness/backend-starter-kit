@@ -27,3 +27,15 @@ describe("ideas creation", () => {
     expect(result.slug).toHaveLength(8);
   });
 });
+
+describe("ideas listing", () => {
+  it("should list ideas", async () => {
+    const testApp = createTestApp(router);
+    const response = await testApp.request("/ideas", {
+      method: "GET",
+    });
+    const result = await response.json();
+    expect(response.status).toBe(200);
+    expect(result).toBeInstanceOf(Array);
+  });
+});
