@@ -3,16 +3,11 @@ import { type Server } from "node:http";
 
 let isShuttingDown = false;
 
-export async function handleSignals(server: Server, ...cbs: Array<() => Promise<void>>) {
-    process.on("SIGINT", () => onShutdown(server, "SIGINT", ...cbs));
-    process.on("SIGTERM", () => onShutdown(server, "SIGTERM", ...cbs));
-}
-
 async function onShutdown(server: Server, signal: string, ...cbs: Array<() => Promise<void>>) {
     if (isShuttingDown) return;
     isShuttingDown = true;
     systemLogger.info(`shutting down started: ${signal} received`);
-
+    
     server.close(async () => {
         systemLogger.info("release resources started");
         for (const cb of cbs) {
@@ -26,3 +21,7 @@ async function onShutdown(server: Server, signal: string, ...cbs: Array<() => Pr
     systemLogger.info("shutting down completed");
 }
 
+export async function handleSignals(server: Server, ...cbs: Array<() => Promise<void>>) {
+    process.on("SIGINT", () => onShutdown(server, "SIGINT", ...cbs));
+    process.on("SIGTERM", () => onShutdown(server, "SIGTERM", ...cbs));
+}
