@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 
 import type { AppRouteHandler } from "@/lib/types.js";
 
-import db from "@/db/index.js";
+import {db} from "@/db/index.js";
 import { tasksTable } from "@/db/schema/tasks.js";
 import * as HTTP_STATUS_CODES from "@/framework/hono/http-status-codes.js";
 import * as HTTP_STATUS_PHRASES from "@/framework/hono/http-status-phrases.js";

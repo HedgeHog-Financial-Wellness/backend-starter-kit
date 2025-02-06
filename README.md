@@ -10,6 +10,7 @@ The backend starter kit contains all the module for building the scalable rest  
 * Lint: Eslint, antfu eslint
 * dev api test: vscode rest client
 * scalar
+* Secure Headers: Helmet: understand each security Header enabled.
 
 ### Question
 

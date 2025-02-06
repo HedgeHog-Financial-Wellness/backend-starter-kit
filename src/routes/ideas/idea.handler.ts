@@ -5,7 +5,7 @@ import { nanoid } from "nanoid";
 import type { createIdeaSchemaResBody, listIdeasSchemaResBody } from "@/db/schema/ideas.js";
 import type { AppRouteHandler } from "@/lib/types.js";
 
-import db from "@/db/index.js";
+import {db} from "@/db/index.js";
 import { ideasTable } from "@/db/schema/ideas.js";
 import * as HTTP_STATUS_CODES from "@/framework/hono/http-status-codes.js";
 

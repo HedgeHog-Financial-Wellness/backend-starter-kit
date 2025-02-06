@@ -4,6 +4,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.cjs",
+    "build": "tsup",
     "lint": "eslint .",
     "lint:fix": "pnpm run lint --fix",
     "test": "vitest",
@@ -15,11 +17,15 @@
     "@asteasolutions/zod-to-openapi": "^7.3.0",
     "@hono/node-server": "^1.13.8",
     "@hono/zod-openapi": "^0.18.3",
+    "@scalar/express-api-reference": "^0.4.179",
     "@scalar/hono-api-reference": "^0.5.170",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "dotenv-expand": "^12.0.1",
     "drizzle-orm": "^0.39.1",
     "drizzle-zod": "^0.7.0",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
     "hono": "^4.6.20",
     "hono-pino": "^0.7.0",
     "nanoid": "^5.0.9",
@@ -30,12 +36,21 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.1.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
     "@types/node": "^20.11.17",
     "@types/pg": "^8.11.11",
     "drizzle-kit": "^0.30.4",
     "eslint": "^9.19.0",
     "eslint-plugin-format": "^1.0.1",
+    "tsup": "^8.3.6",
     "tsx": "^4.19.2",
     "vitest": "^3.0.4"
+  },
+  "tsup": {
+    "entry": ["src", "!src/**/__tests__/**", "!src/**/*.test.*"],
+    "splitting": false,
+    "sourcemap": true,
+    "clean": true
   }
 }
