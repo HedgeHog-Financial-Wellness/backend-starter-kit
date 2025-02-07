@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "start": "node dist/index.cjs",
-    "build": "tsup",
+    "start": "node dist/index.js",
+    "build": "tsup --format esm",
     "lint": "eslint .",
     "lint:fix": "pnpm run lint --fix",
     "test": "vitest",
@@ -68,6 +68,7 @@
     ],
     "splitting": false,
     "sourcemap": true,
-    "clean": true
+    "clean": true,
+    "esm": true
   }
 }
