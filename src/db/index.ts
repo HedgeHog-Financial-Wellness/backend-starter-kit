@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import env from "@/env.js";
 import pg from 'pg'
 import { systemLogger } from "@/utils/logger.js";
+
 const versionQuery = sql`SELECT version() as version`;
 
 const errDatabaseNotConnected = new Error('Database not connected. Call connect() first.');
@@ -20,7 +21,7 @@ export const connect = async () => {
         connectionString: env.DATABASE_URL,
     });
 
-    db = drizzle({client: pool});
+    db = drizzle({ client: pool });
     await healthCheck();
     systemLogger.info('Database connected');
     return db;
@@ -41,8 +42,8 @@ export const healthCheck = async () => {
 
     try {
         const version = await queryVersion();
-        // WIP: add the ability to use common system logger.
-        systemLogger.info('Database version:', version);
+
+        systemLogger.info(`Database version: ${version}`);
     } catch (error) {
         systemLogger.error(error);
         // WIP: add the ability to wrap errors in a common error type.
@@ -60,11 +61,3 @@ const queryVersion = async () => {
     }
     return result.rows[0].version;
 };
-
-
-
-// Example usage:
-// await database.connect();
-// const db = database.getInstance();
-// const isHealthy = await database.healthCheck();
-// await database.disconnect();
