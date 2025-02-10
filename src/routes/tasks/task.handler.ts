@@ -1,69 +1,76 @@
-import { eq } from "drizzle-orm";
+import type { ServerInferRequest, ServerInferResponses } from "@ts-rest/core";
 
-import type { AppRouteHandler } from "@/lib/types.js";
+import * as HTTP_STATUS_PHRASES from "@/common/http/http-status-phrases.js";
 
-import {db} from "@/db/index.js";
-import { tasksTable } from "@/db/schema/tasks.js";
-import * as HTTP_STATUS_CODES from "@/framework/hono/http-status-codes.js";
-import * as HTTP_STATUS_PHRASES from "@/framework/hono/http-status-phrases.js";
+import type { TaskContract } from "./task.contract.js";
+import type { TaskService } from "./task.service.js";
 
-import type {
-  CreateRoute,
-  DeleteOneRoute,
-  GetOneRoute,
-  ListRoute,
-  PatchRoute,
-} from "./task.routes.js";
+type ResponseShapes = ServerInferResponses<typeof TaskContract>;
+type RequestShapes = ServerInferRequest<typeof TaskContract>;
 
-export const list: AppRouteHandler<ListRoute> = async (c) => {
-  const tasks = await db.select().from(tasksTable);
-  c.var.logger.info("Listing tasks");
-  return c.json(tasks);
-};
+export class TaskHandler {
+  constructor(private taskService: TaskService) { }
 
-export const create: AppRouteHandler<CreateRoute> = async (c) => {
-  const task = c.req.valid("json");
-  const [newTask] = await db.insert(tasksTable).values(task).returning();
-  return c.json(newTask, HTTP_STATUS_CODES.OK);
-};
+  list = async (): Promise<ResponseShapes["list"]> => {
+    const tasks = await this.taskService.list();
+    return {
+      status: 200 as const,
+      body: tasks,
+    };
+  };
 
-export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
-  const [task] = await db.select()
-    .from(tasksTable)
-    .where(eq(tasksTable.id, Number(c.req.param("id"))));
+  create = async (request: RequestShapes["create"]): Promise<ResponseShapes["create"]> => {
+    const task = request.body;
+    const newTask = await this.taskService.create(task.name, task.done);
+    return {
+      status: 200 as const,
+      body: newTask,
+    };
+  };
 
-  if (!task) {
-    return c.json({ message: "Task not found" }, HTTP_STATUS_CODES.NOT_FOUND);
-  }
+  get = async (request: RequestShapes["get"]): Promise<ResponseShapes["get"]> => {
+    const task = await this.taskService.get(Number(request.params.id));
 
-  return c.json(task, HTTP_STATUS_CODES.OK);
-};
+    if (!task) {
+      return {
+        status: 404 as const,
+        body: {
+          message: HTTP_STATUS_PHRASES.NOT_FOUND,
+        },
+      };
+    }
 
-export const patch: AppRouteHandler<PatchRoute> = async (c) => {
-  const id = Number(c.req.param("id"));
-  const updates = c.req.valid("json");
-  const [updatedTask] = await db
-    .update(tasksTable)
-    .set(updates)
-    .where(eq(tasksTable.id, id))
-    .returning();
-  if (!updatedTask) {
-    return c.json(
-      { message: HTTP_STATUS_PHRASES.NOT_FOUND },
-      HTTP_STATUS_CODES.NOT_FOUND,
-    );
-  }
-  return c.json(updatedTask, HTTP_STATUS_CODES.OK);
-};
+    return {
+      status: 200 as const,
+      body: task,
+    };
+  };
 
-export const deleteOne: AppRouteHandler<DeleteOneRoute> = async (c) => {
-  const id = Number(c.req.param("id"));
-  const result = await db.delete(tasksTable).where(eq(tasksTable.id, id));
-  if (!result.rowCount || result.rowCount === 0) {
-    return c.json(
-      { message: HTTP_STATUS_PHRASES.NOT_FOUND },
-      HTTP_STATUS_CODES.NOT_FOUND,
-    );
-  }
-  return c.body(null, HTTP_STATUS_CODES.NO_CONTENT);
-};
+  update = async (request: RequestShapes["update"]): Promise<ResponseShapes["update"]> => {
+    const id = Number(request.params.id);
+    const updates = request.body;
+    const updatedTask = await this.taskService.update(id, updates);
+    if (!updatedTask) {
+      return {
+        status: 404 as const,
+        body: {
+          message: HTTP_STATUS_PHRASES.NOT_FOUND,
+        },
+      };
+    }
+    return {
+      status: 200 as const,
+      body: updatedTask,
+    };
+  };
+
+  delete = async (request: RequestShapes["delete"]): Promise<ResponseShapes["delete"]> => {
+    await this.taskService.delete(Number(request.params.id));
+    return {
+      status: 200 as const,
+      body: {
+        message: "Task Deleted Successfully",
+      },
+    };
+  };
+}

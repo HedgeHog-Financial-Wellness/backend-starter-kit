@@ -23,7 +23,3 @@ export const listIdeaSchemaResBody = z.array(getIdeaSchemaResBody).openapi({
 });
 
 
-// WIP: make this part of the common schema.
-export const errorResponseSchema = z.object({
-  message: z.string(),
-});

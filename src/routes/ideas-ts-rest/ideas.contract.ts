@@ -1,10 +1,10 @@
 
 import { initContract } from '@ts-rest/core';
 
-import { listIdeaSchemaResBody, getIdeaRequestSchema, errorResponseSchema, getIdeaSchemaResBody } from "./ideas.schema.js";
+import { listIdeaSchemaResBody, getIdeaRequestSchema, getIdeaSchemaResBody } from "./ideas.schema.js";
+import { errorResponseSchema } from "@/common/zod-openapi-schema.js";
 
-const c = initContract();
-export const ideasContract = c.router({
+export const ideasContract = initContract().router({
   list: {
     method: 'GET',
     path: `/`,
