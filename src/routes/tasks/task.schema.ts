@@ -6,9 +6,7 @@ import { tasksTable } from "../../db/schema/tasks.js";
 
 extendZodWithOpenApi(z);
 
-export const getTaskSchemaResBody = createSelectSchema(tasksTable).omit({
-  id: true,
-}).openapi({
+export const getTaskSchemaResBody = createSelectSchema(tasksTable).openapi({
   title: "Task",
   description: "A task Schema",
 });

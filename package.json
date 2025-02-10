@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "lint:fix": "pnpm run lint --fix",
     "test": "vitest",
+    "test:ui": "vitest --ui",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"
@@ -53,6 +54,7 @@
     "@types/node": "^20.17.16",
     "@types/pg": "^8.11.11",
     "@types/swagger-ui-express": "^4.1.7",
+    "@vitest/ui": "3.0.4",
     "drizzle-kit": "^0.30.4",
     "eslint": "^9.19.0",
     "eslint-plugin-format": "^1.0.1",

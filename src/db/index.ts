@@ -1,63 +1,60 @@
-import { drizzle } from "drizzle-orm/node-postgres";
 import { sql } from "drizzle-orm";
-import env from "@/env.js";
-import pg from 'pg'
-import { systemLogger } from "@/utils/logger.js";
+import { drizzle } from "drizzle-orm/node-postgres";
+import pg from "pg";
 
 const versionQuery = sql`SELECT version() as version`;
 
-const errDatabaseNotConnected = new Error('Database not connected. Call connect() first.');
-const errDatabaseVersionNotFound = new Error('Database version not found');
-const errDBHealthCheckFailed = new Error('Database health check failed');
+const errDatabaseVersionNotFound = new Error("Database version not found");
 
-let pool: pg.Pool | null = null;
-export let db: ReturnType<typeof drizzle>;
+async function queryVersion(db: ReturnType<typeof drizzle>): Promise<string> {
+  const result = await db.execute(versionQuery);
+  const version = result.rows[0]?.version;
+  if (typeof version !== "string") throw errDatabaseVersionNotFound;
+  return version;
+}
 
-export const connect = async () => {
-    if (pool) return db;
+function dbInstance(url: string) {
+  let pool: pg.Pool | null = null;
+  let db: ReturnType<typeof drizzle> | null = null;
+  let connecting: Promise<ReturnType<typeof drizzle>> | null = null;
 
-    // WIP: rethink this: how to handle multiple DATABASE_URLs
-    pool = new pg.Pool({
-        connectionString: env.DATABASE_URL,
-    });
+  const connect = async () => {
+    if (db) return db;
+    if (connecting) return connecting;
 
-    db = drizzle({ client: pool });
-    await healthCheck();
-    systemLogger.info('Database connected');
-    return db;
-};
+    connecting = (async () => {
+      pool = new pg.Pool({ connectionString: url });
+      db = drizzle({ client: pool });
 
-export const disconnect = async () => {
-    if (pool) {
+      try {
+        const version = await queryVersion(db);
+        console.log(`database connected, version: ${version}`);
+        return db;
+      } catch (error) {
         await pool.end();
-        pool = null;
-        systemLogger.info('Database disconnected');
-    }
-};
+        throw error;
+      }
+    })();
 
-export const healthCheck = async () => {
-    if (!pool) {
-        throw errDatabaseNotConnected;
-    }
+    return connecting.finally(() => (connecting = null));
+  };
 
-    try {
-        const version = await queryVersion();
+  const disconnect = async () => {
+    if (pool) {
+      await pool.end();
+      pool = null;
+      db = null;
+      console.log("database disconnected");
+    }
+  };
 
-        systemLogger.info(`Database version: ${version}`);
-    } catch (error) {
-        systemLogger.error(error);
-        // WIP: add the ability to wrap errors in a common error type.
-        throw errDBHealthCheckFailed;
-    }
-};
+  return { connect, disconnect };
+}
 
-const queryVersion = async () => {
-    if (!db) {
-        throw errDatabaseNotConnected;
-    }
-    const result = await db.execute(versionQuery);
-    if (result.rows.length === 0 || !result.rows[0].version) {
-        throw errDatabaseVersionNotFound;
-    }
-    return result.rows[0].version;
-};
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) throw new Error("DATABASE_URL environment variable is not set");
+
+const dbInst = dbInstance(databaseUrl);
+const db = await dbInst.connect();
+
+export default Object.freeze({ db, disconnect: dbInst.disconnect });

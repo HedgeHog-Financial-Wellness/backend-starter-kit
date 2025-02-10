@@ -15,11 +15,18 @@ export class TaskModel implements TaskRepository {
   constructor(private db: ReturnType<typeof drizzle>) { }
 
   async list(): Promise<Task[]> {
-    const tasks = await this.db.select().from(tasksTable);
-    if (!tasks) {
+    const dbTasks = await this.db.select().from(tasksTable);
+    if (!dbTasks) {
       return [];
     }
-    return tasks;
+
+    return dbTasks.map(task => ({
+      id: task.id,
+      name: task.name,
+      done: task.done,
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
+    })) as Task[];
   }
 
   async get(id: number): Promise<Task | null> {
