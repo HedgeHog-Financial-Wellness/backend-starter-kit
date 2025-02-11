@@ -2,6 +2,11 @@
 
 ### Step-by-Step Guidelines for Adding a New Route to the Project
 
+**e.g. :** `project` domain entity is added.
+
+0. **Create Database Schema**:
+  create a new schema under `src/db/schema` folder.
+
 1. **Create the Folder Structure**:
     - Create a new folder under `src/routes/` for the new route. For example, if the new route is for "projects", create `src/routes/projects/`.
 
@@ -11,7 +16,7 @@
 
     ```typescript
     import { initContract } from '@ts-rest/core';
-    import { listProjectSchemaResBody, getProjectSchemaResBody, createProjectSchemaReqBody, patchProjectSchemaReqBody, getProjectRequestPathParamSchema } from "./project.schema.js";
+    import { projectListSchema, projectSchema, createProjectSchema, patchProject, getProjectRequestPathParamSchema } from "./project.schema.js";
     import { errorResponseSchema } from "@/common/zod-openapi-schema.js";
 
     export const projectsContract = initContract().router({
@@ -19,7 +24,7 @@
         method: "GET",
         path: "/",
         responses: {
-          200: listProjectSchemaResBody,
+          200: projectListSchema,
         },
         summary: 'Get a list of projects',
       },
@@ -28,7 +33,7 @@
         path: "/:id",
         pathParams: getProjectRequestPathParamSchema,
         responses: {
-          200: getProjectSchemaResBody,
+          200: projectSchema,
           404: errorResponseSchema,
         },
         summary: 'Get a project',
@@ -36,9 +41,9 @@
       create: {
         method: "POST",
         path: "/",
-        body: createProjectSchemaReqBody,
+        body: createProjectSchema,
         responses: {
-          200: getProjectSchemaResBody,
+          200: projectSchema,
           422: errorResponseSchema,
         },
         summary: 'Create a project',
@@ -47,9 +52,9 @@
         method: "PATCH",
         path: "/:id",
         pathParams: getProjectRequestPathParamSchema,
-        body: patchProjectSchemaReqBody,
+        body: patchProject,
         responses: {
-          200: getProjectSchemaResBody,
+          200: projectSchema,
           404: errorResponseSchema,
           422: errorResponseSchema,
         },
@@ -70,324 +75,320 @@
       pathPrefix: '/projects',
     });
     ```
+  **NOTE**: the above schema are extended open api zod schema created in the `project.schema.ts` file.
 
 3. **Define the Data Validation Schemas**:
     - Create a file named `project.schema.ts` in the new folder.
     - Define the data validation schemas using `zod`.
+    - The zod root schema is created from drizzle schema using `drizzle-zod` package.
 
     ```typescript
-    import { z } from "zod";
-    import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-    import { projectsTable } from "../../db/schema/projects.js";
-    import { extendZodWithOpenApi } from '@anatine/zod-openapi';
+  import { extendZodWithOpenApi } from "@anatine/zod-openapi";
+  import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
+  import { z } from "zod";
 
-    extendZodWithOpenApi(z);
+  import { projectTable } from "../../db/schema/project.js";
 
-    export const getProjectSchemaResBody = createSelectSchema(projectsTable).omit({
-      id: true,
-    }).openapi({
-      title: "Project",
-      description: "A project Schema",
-    });
+  extendZodWithOpenApi(z);
 
-    export const getProjectRequestPathParamSchema = z.object({
-      id: z.string().uuid(),
-    });
+  export const projectSchema = createSelectSchema(projectTable).openapi({
+    title: "Project",
+    description: "A project Schema",
+  });
 
-    export const listProjectSchemaResBody = z.array(getProjectSchemaResBody).openapi({
-      title: "Project List",
-      description: "A list of projects",
-    });
+  export const getProjectRequestPathParamSchema = z.object({
+    id: z.coerce.number(),
+  });
 
-    export const createProjectSchemaReqBody = createInsertSchema(projectsTable, {
-      name: schema => schema.min(1).max(500),
+  export const projectListSchema = z.array(projectSchema).openapi({
+    title: "Project List",
+    description: "A list of projects",
+  });
+
+  export const createProjectSchema = createInsertSchema(projectTable, {
+    name: z.string().min(1).max(500),
+  })
+    .required({
+      name: true,
+      done: true,
     })
-      .required({
-        done: true,
-      })
-      .omit({
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-      });
+    .omit({
+      id: true,
+      createdAt: true,
+      updatedAt: true,
+    });
 
-    export const patchProjectSchemaReqBody = createProjectSchemaReqBody.partial();
+  export const patchProjectSchema = createUpdateSchema(projectTable, {
+    name: z.string().min(1).max(500),
+    done: z.boolean(),
+  }).partial();
+
+  export const deleteProjectSchema = z.object({});
+
+  export type Project = z.infer<typeof projectSchema>;
+  export type UpdateProject = z.infer<typeof patchTaskSchema>;
     ```
 
-4. **Create the Repository Interface**:
+2. **Create the Repository Interface**:
     - Create a file named `project.repository.ts` in the new folder.
     - Define the interface for data access methods.
 
     ```typescript
-    import { projectsTable } from "@/db/schema/projects.js"
+    import type { Project, UpdateProject } from "./task.schema.js";
 
-    export interface ProjectRepository {
-      list(): Promise<Array<typeof projectsTable.$inferSelect>> 
-      get(id: number): Promise<typeof projectsTable.$inferSelect | null> 
-      create(project: typeof projectsTable.$inferInsert): Promise<typeof projectsTable.$inferSelect> 
-      update(id: number, project: Partial<typeof projectsTable.$inferSelect>): Promise<typeof projectsTable.$inferSelect> 
-      delete(id: number): Promise<void> 
-    }
+  export interface ProjectRepository {
+    list: () => Promise<Project[]>;
+    get: (id: number) => Promise<Project | null>;
+    create: (name: string, done: boolean) => Promise<Project>;
+    update: (id: number, task: ProjectTask) => Promise<Project>;
+    delete: (id: number) => Promise<void>;
+  }
+
     ```
 
-5. **Implement the Data Model**:
+3. **Implement the Data Model**:
     - Create a file named `project.model.ts` in the new folder.
     - Implement the data model that interacts with the database.
 
     ```typescript
-    import { eq } from "drizzle-orm";
-    import { drizzle } from "drizzle-orm/node-postgres";
-    import { projectsTable } from "@/db/schema/projects.js";
-    import type { ProjectRepository } from "./project.repository.js";
+  import type { drizzle } from "drizzle-orm/node-postgres";
 
-    const errProjectCreationFailed = new Error("Unable to create project");
-    const errProjectUpdateFailed = new Error("Unable to update project");
-    const errProjectDeleteFailed = new Error("Unable to delete project");
+  import { eq } from "drizzle-orm";
 
-    export class ProjectModel implements ProjectRepository {
-      constructor(private db: ReturnType<typeof drizzle>) { }
+  import { projectsTable } from "@/db/schema/projects.js";
 
-      async list(): Promise<Array<typeof projectsTable.$inferSelect>> {
-        const projects = await this.db.select().from(projectsTable);
-        if (!projects) {
-          return [];
-        }
-        return projects;
+  import type { ProjectRepository } from "./project.repository.js";
+  import type { Project, UpdateProject } from "./project.schema.js";
+
+  const errProjectCreationFailed = new Error("Unable to create project");
+  const errProjectUpdateFailed = new Error("Unable to update project");
+  const errProjectDeleteFailed = new Error("Unable to delete project");
+
+  export class ProjectModel implements ProjectRepository {
+    constructor(private db: ReturnType<typeof drizzle>) { }
+
+    async list(): Promise<Project[]> {
+      const dbProjects = await this.db.select().from(projectsTable);
+      if (!dbProjects) {
+        return [];
       }
 
-      async get(id: number): Promise<typeof projectsTable.$inferSelect | null> {
-        const [project] = await this.db.select().from(projectsTable).where(eq(projectsTable.id, id));
-        if (!project) {
-          return null;
-        }
-        return project;
+      return dbProjects.map(project => ({
+        id: project.id,
+        name: project.name,
+        done: project.done,
+        createdAt: project.createdAt,
+        updatedAt: project.updatedAt,
+      })) as Project[];
+    }
+
+    async get(id: number): Promise<Project | null> {
+      const [project] = await this.db.select().from(projectsTable).where(eq(projectsTable.id, id));
+      if (!project) {
+        return null;
+      }
+      return {
+        id: project.id,
+        name: project.name,
+        done: project.done,
+        createdAt: project.createdAt,
+        updatedAt: project.updatedAt,
+      } as Project;
+    }
+
+    async create(name: string, done: boolean): Promise<Project> {
+      const dbProject: typeof projectsTable.$inferInsert = {
+        name,
+        done,
+      };
+      const result = await this.db.insert(projectsTable).values(dbProject).returning();
+      if (result.length === 0) {
+        throw errProjectCreationFailed;
       }
 
-      async create(project: typeof projectsTable.$inferInsert): Promise<typeof projectsTable.$inferSelect> {
-        const result = await this.db.insert(projectsTable).values(project).returning();
-        if (result.length === 0) {
-          throw errProjectCreationFailed;
-        }
-        return result[0];
-      }
+      return {
+        id: result[0].id,
+        name: result[0].name,
+        done: result[0].done,
+        createdAt: result[0].createdAt,
+        updatedAt: result[0].updatedAt,
+      } as Project;
+    }
 
-      async update(id: number, project: Partial<typeof projectsTable.$inferSelect>): Promise<typeof projectsTable.$inferSelect> {
-        const result = await this.db.update(projectsTable).set(project).where(eq(projectsTable.id, id)).returning();
-        if (result.length === 0) {
-          throw errProjectUpdateFailed;
-        }
-        return result[0];
+    async update(id: number, project: UpdateProject): Promise<Project> {
+      const result = await this.db.update(projectsTable).set(project).where(eq(projectsTable.id, id)).returning();
+      if (result.length === 0) {
+        throw errProjectUpdateFailed;
       }
+      return result[0];
+    }
 
-      async delete(id: number): Promise<void> {
-        const result = await this.db.delete(projectsTable).where(eq(projectsTable.id, id));
-        if (result.rowCount === 0) {
-          throw errProjectDeleteFailed;
-        }
+    async delete(id: number): Promise<void> {
+      const result = await this.db.delete(projectsTable).where(eq(projectsTable.id, id));
+      if (result.rowCount === 0) {
+        throw errProjectDeleteFailed;
       }
     }
+  }
     ```
 
-6. **Implement the Service Layer**:
+4. **Implement the Service Layer**:
     - Create a file named `project.service.ts` in the new folder.
     - Implement the business logic that interacts with the repository.
 
     ```typescript
-    import { z } from "zod";
-    import { projectsTable } from "@/db/schema/projects.js";
-    import type { ProjectRepository } from "./project.repository.js";
-    import type { getProjectSchemaResBody, listProjectSchemaResBody } from "./project.schema.js";
-    import type { UpdateProjectDto } from "./project.dto.js";
+  import type { ProjectRepository } from "./project.repository.js";
+  import type { Project, UpdateProject } from "./project.schema.js";
 
-    const errProjectNotFound = new Error("Project not found");
+  export class ProjectService {
+    constructor(private projectRepository: ProjectRepository) { }
 
-    export class ProjectService {
-      constructor(private projectRepository: ProjectRepository) { }
+    async list(): Promise<Project[]> {
+      return await this.projectRepository.list();
+    };
 
-      async list(): Promise<z.infer<typeof listProjectSchemaResBody>> {
-        const projects = await this.projectRepository.list();
+    async create(name: string, done: boolean): Promise<Project> {
+      return await this.projectRepository.create(name, done);
+    };
 
-        return projects.map(({ id, ...rest }) => ({
-          ...rest
-        }));
-      };
+    async get(projectId: number): Promise<Project | null> {
+      return await this.projectRepository.get(projectId);
+    };
 
-      async create(name: string, done: boolean): Promise<z.infer<typeof getProjectSchemaResBody>> {
-        const project: typeof projectsTable.$inferInsert = {
-          name,
-          done,
-        };
-        const newProject = await this.projectRepository.create(project);
-        const { id, ...rest } = newProject;
-        return rest;
-      };
+    async update(projectId: number, updates: UpdateProject): Promise<Project> {
+      return await this.projectRepository.update(projectId, updates);
+    };
 
-      async get(projectId: number): Promise<z.infer<typeof getProjectSchemaResBody>> {
-        const project = await this.projectRepository.get(projectId);
-
-        if (!project) {
-          throw errProjectNotFound;
-        }
-        const { id, ...rest } = project;
-        return rest;
-      };
-
-      async update(projectId: number, updates: UpdateProjectDto): Promise<z.infer<typeof getProjectSchemaResBody>> {
-        const project: Partial<typeof projectsTable.$inferSelect> = {
-          ...updates,
-        };
-        const updatedProject = await this.projectRepository.update(projectId, project);
-        const { id, ...rest } = updatedProject;
-        return rest;
-      };
-
-      async delete(projectId: number): Promise<void> {
-        await this.projectRepository.delete(projectId);
-      };
-    }
+    async delete(projectId: number): Promise<void> {
+      await this.projectRepository.delete(projectId);
+    };
+  }
     ```
 
-7. **Implement the Handler**:
+5. **Implement the Handler**:
     - Create a file named `project.handler.ts` in the new folder.
     - Implement the handler that processes HTTP requests and responses.
 
-    ```typescript
-    import * as HTTP_STATUS_PHRASES from "@/framework/hono/http-status-phrases.js";
-    import { type ServerInferResponses, type ServerInferRequest } from "@ts-rest/core";
-    import { projectsContract } from "./project.contract.js";
-    import type { ProjectService } from "./project.service.js";
+  ```ts
+  import type { ServerInferRequest, ServerInferResponses } from "@ts-rest/core";
 
-    type ResponseShapes = ServerInferResponses<typeof projectsContract>
-    type RequestShapes = ServerInferRequest<typeof projectsContract>
+  import * as HTTP_STATUS_PHRASES from "@/common/http/http-status-phrases.js";
 
-    export class ProjectHandler {
-      constructor(private projectService: ProjectService) { }
+  import type { ProjectContract } from "./project.contract.js";
+  import type { ProjectService } from "./project.service.js";
 
-      async list(): Promise<ResponseShapes['list']> {
-        const projects = await this.projectService.list();
-        return {
-          status: 200 as const,
-          body: projects,
-        };
+  type ResponseShapes = ServerInferResponses<typeof ProjectContract>;
+  type RequestShapes = ServerInferRequest<typeof ProjectContract>;
+
+  export class ProjectHandler {
+    constructor(private projectService: ProjectService) { }
+
+    list = async (): Promise<ResponseShapes["list"]> => {
+      const projects = await this.projectService.list();
+      return {
+        status: 200 as const,
+        body: projects,
       };
+    };
 
-      async create(request: RequestShapes['create']): Promise<ResponseShapes['create']> {
-        const project = request.body;
-        const newProject = await this.projectService.create(project.name, project.done);
+    create = async (request: RequestShapes["create"]): Promise<ResponseShapes["create"]> => {
+      const project = request.body;
+      const newProject = await this.projectService.create(project.name, project.done);
+      return {
+        status: 200 as const,
+        body: {
+          id: newProject.id,
+          name: newProject.name,
+          done: newProject.done,
+          createdAt: newProject.createdAt,
+          updatedAt: newProject.updatedAt,
+        } as ResponseShapes["create"]["body"],
+      } as ResponseShapes["create"];
+    };
+
+    get = async (request: RequestShapes["get"]): Promise<ResponseShapes["get"]> => {
+      const project = await this.projectService.get(Number(request.params.id));
+
+      if (!project) {
         return {
-          status: 200 as const,
-          body: newProject,
+          status: 404 as const,
+          body: {
+            message: HTTP_STATUS_PHRASES.NOT_FOUND,
+          },
         };
+      }
+
+      return {
+        status: 200 as const,
+        body: project,
       };
+    };
 
-      async get(request: RequestShapes['get']): Promise<ResponseShapes['get']> {
-        const project = await this.projectService.get(Number(request.params.id));
-
-        if (!project) {
-          return {
-            status: 404 as const,
-            body: {
-              message: HTTP_STATUS_PHRASES.NOT_FOUND,
-            },
-          };
-        }
-
+    update = async (request: RequestShapes["update"]): Promise<ResponseShapes["update"]> => {
+      const id = Number(request.params.id);
+      const updates = request.body;
+      const updatedProject = await this.projectService.update(id, updates);
+      if (!updatedProject) {
         return {
-          status: 200 as const,
-          body: project,
+          status: 404 as const,
+          body: {
+            message: HTTP_STATUS_PHRASES.NOT_FOUND,
+          },
         };
+      }
+      return {
+        status: 200 as const,
+        body: updatedProject,
       };
+    };
 
-      async update(request: RequestShapes['update']): Promise<ResponseShapes['update']> {
-        const id = Number(request.params.id);
-        const updates = request.body;
-        const updatedProject = await this.projectService.update(id, updates);
-        if (!updatedProject) {
-          return {
-            status: 404 as const,
-            body: {
-              message: HTTP_STATUS_PHRASES.NOT_FOUND,
-            },
-          };
-        }
-        return {
-          status: 200 as const,
-          body: updatedProject,
-        };
+    delete = async (request: RequestShapes["delete"]): Promise<ResponseShapes["delete"]> => {
+      await this.projectService.delete(Number(request.params.id));
+      return {
+        status: 200 as const,
+        body: {
+          message: "Project Deleted Successfully",
+        },
       };
+    };
+  }
+  ```
 
-      async delete(request: RequestShapes['delete']): Promise<ResponseShapes['delete']> {
-        await this.projectService.delete(Number(request.params.id));
-        return {
-          status: 204 as const,
-          body: null,
-        };
-      };
-    }
-    ```
-
-8. **Configure the Routes**:
+6. **Configure the Routes**:
     - Create a file named `projects.index.ts` in the new folder.
     - Configure and initialize the routes.
 
     ```typescript
-    import { createRouter } from "@/lib/create-app.js";
-    import * as handler from "./project.handler.js";
-    import * as routes from "./project.routes.js";
+  import type { drizzle } from "drizzle-orm/node-postgres";
+  import type { Application } from "express";
 
-    const router = createRouter()
-      .openapi(routes.list, handler.list)
-      .openapi(routes.create, handler.create)
-      .openapi(routes.getOne, handler.getOne)
-      .openapi(routes.patch, handler.patch)
-      .openapi(routes.deleteOne, handler.deleteOne);
+  import { createExpressEndpoints, initServer } from "@ts-rest/express";
 
-    export default router;
-    ```
+  import { ProjectContract } from "./project.contract.js";
+  import { ProjectHandler } from "./project.handler.js";
+  import { ProjectModel } from "./project.model.js";
+  import { ProjectService } from "./project.service.js";
 
-9. **Add Unit Tests**:
-    - Create a file named `project.test.ts` in the new folder.
-    - Add unit tests for the new routes.
-
-    ```typescript
-    import { describe, expect, it } from "vitest";
-    import { createTestApp } from "@/lib/create-app.js";
-    import router from "./projects.index.js";
-
-    describe("projects List", () => {
-      it("should return a list of projects", async () => {
-        const testApp = createTestApp(router);
-        const response = await testApp.request("/projects");
-        const result = await response.json ();
-        expect(response.status).toBe(200);
-        expect(result).toBeInstanceOf(Array);
-      });
-
-      it("should return a list of projects: again:> using test client", async () => {
-        const testApp = createTestApp(router);
-        const response = await testApp.request("/projects");
-        const result = await response.json();
-        expect(response.status).toBe(200);
-        expect(result).toBeInstanceOf(Array);
-      });
+  export function configureProjectsEndpoints(db: ReturnType<typeof drizzle>, app: Application) {
+    const projectModel = new ProjectModel(db);
+    const projectService = new ProjectService(projectModel);
+    const projectHandler = new ProjectHandler(projectService);
+    const s = initServer();
+    const projectsRouter = s.router(ProjectContract, {
+      list: projectHandler.list.bind(projectHandler),
+      get: projectHandler.get.bind(projectHandler),
+      create: projectHandler.create.bind(projectHandler),
+      update: projectHandler.update.bind(projectHandler),
+      delete: projectHandler.delete.bind(projectHandler),
     });
+
+    createExpressEndpoints(ProjectContract, projectsRouter, app);
+  }
     ```
 
-10. **Integrate the New Route**:
-    - Update the main application file (e.g., `src/index.ts`) to include the new route.
+7. **Add Tests**:
+    - e2e test using super-test
+    - integration test on *.model.ts file
 
-    ```typescript
-    import express from "express";
-    import { configureProjectsEndpoints } from "./routes/projects/index.js";
-
-    const app = express();
-    const db = drizzle(/* database configuration */);
-
-    configureProjectsEndpoints(db, app);
-
-    app.listen(3000, () => {
-      console.log("Server is running on port 3000");
-    });
-    ```
 
 Following these steps will help you add a new route to the project in a structured and consistent manner.
