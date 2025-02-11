@@ -9,7 +9,7 @@ export default antfu({
     semi: true,
     quotes: "double",
   },
-  ignores: ["**/migrations/*", "README.md", "drizzle", "infra"],
+  ignores: [".vscode", "dist", "docs", "drizzle", "infra", "node_modules", "**/migrations/*", "README.md"],
 }, {
   rules: {
     "no-console": ["warn"],
