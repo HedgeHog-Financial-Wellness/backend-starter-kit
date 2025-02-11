@@ -11,5 +11,19 @@ services:
       POSTGRES_DB: "hedgehog"
     volumes:
       - backend-starter-kit-db-local-vol:/var/lib/postgresql/data
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: backend-starter-kit-jaeger-local
+    ports:
+      - "6831:6831/udp"   # Jaeger thrift compact protocol (used by most clients)
+      - "6832:6832/udp"   # Jaeger thrift binary protocol
+      - "5775:5775/udp"   # Zipkin compact thrift protocol
+      - "14250:14250"     # Model.proto
+      - "14268:14268"     # Jaeger HTTP thrift protocol
+      - "16686:16686"     # Web UI
+      - "4317:4317"       # OTLP gRPC
+      - "4318:4318"       # OTLP HTTP
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
 volumes:
     backend-starter-kit-db-local-vol:
