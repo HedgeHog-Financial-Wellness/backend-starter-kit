@@ -24,8 +24,14 @@ export class TaskHandler {
     const newTask = await this.taskService.create(task.name, task.done);
     return {
       status: 200 as const,
-      body: newTask,
-    };
+      body: {
+        id: newTask.id,
+        name: newTask.name,
+        done: newTask.done,
+        createdAt: newTask.createdAt,
+        updatedAt: newTask.updatedAt,
+      } as ResponseShapes["create"]["body"],
+    } as ResponseShapes["create"];
   };
 
   get = async (request: RequestShapes["get"]): Promise<ResponseShapes["get"]> => {

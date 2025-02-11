@@ -34,7 +34,13 @@ export class TaskModel implements TaskRepository {
     if (!task) {
       return null;
     }
-    return task;
+    return {
+      id: task.id,
+      name: task.name,
+      done: task.done,
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
+    } as Task;
   }
 
   async create(name: string, done: boolean): Promise<Task> {
@@ -46,7 +52,14 @@ export class TaskModel implements TaskRepository {
     if (result.length === 0) {
       throw errTaskCreationFailed;
     }
-    return result[0];
+
+    return {
+      id: result[0].id,
+      name: result[0].name,
+      done: result[0].done,
+      createdAt: result[0].createdAt,
+      updatedAt: result[0].updatedAt,
+    } as Task;
   }
 
   async update(id: number, task: UpdateTask): Promise<Task> {

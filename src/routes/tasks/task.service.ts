@@ -1,8 +1,6 @@
 import type { TaskRepository } from "./task.repository.js";
 import type { Task, UpdateTask } from "./task.schema.js";
 
-const errTaskNotFound = new Error("Task not found");
-
 export class TaskService {
   constructor(private taskRepository: TaskRepository) { }
 
@@ -14,13 +12,8 @@ export class TaskService {
     return await this.taskRepository.create(name, done);
   };
 
-  async get(taskId: number): Promise<Task> {
-    const task = await this.taskRepository.get(taskId);
-
-    if (!task) {
-      throw errTaskNotFound;
-    }
-    return task;
+  async get(taskId: number): Promise<Task | null> {
+    return await this.taskRepository.get(taskId);
   };
 
   async update(taskId: number, updates: UpdateTask): Promise<Task> {

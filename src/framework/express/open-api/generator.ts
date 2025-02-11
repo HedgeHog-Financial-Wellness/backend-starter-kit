@@ -1,14 +1,19 @@
 import { generateOpenApi } from '@ts-rest/open-api';
 
-import { ideasContract } from '../../../routes/ideas-ts-rest/ideas.contract.js';
+import { TaskContract } from '../../../routes/tasks/task.contract.js';
+import { ideasContract } from '@/routes/ideas-ts-rest/ideas.contract.js';
+import { initContract } from '@ts-rest/core';
 
-// WIP: create a ts-rest helper to aggregate all contracts and generate a single open api document.
-// WIP: rethink on how to handle multiple contracts.
 export const generateOpenApiDocument = () => {
+  
+  const contract = initContract().router({
+    ...TaskContract,
+    ...ideasContract,
+  });
 
-  return generateOpenApi(ideasContract, {
+  return generateOpenApi(contract, {
     info: {
-      title: 'Ideas API',
+      title: 'Tasks API',
       version: '1.0.0',
     },
   });

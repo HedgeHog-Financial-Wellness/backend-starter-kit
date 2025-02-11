@@ -1,8 +1,10 @@
-import express, { Router, type Express } from "express";
+import express, { type Express } from "express";
 
 export function createApp() {
 
     const app: Express = express();
+
+    app.use(express.json());
 
     app.get("/", (req, res) => {
         res.send("Hello World");

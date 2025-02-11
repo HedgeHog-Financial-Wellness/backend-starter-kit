@@ -25,4 +25,5 @@ export const ideasContract = initContract().router({
   },
 }, {
   pathPrefix: '/ideas',
+  tags: ["ideas"],
 });

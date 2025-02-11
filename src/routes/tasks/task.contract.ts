@@ -2,14 +2,14 @@ import { initContract } from "@ts-rest/core";
 
 import { errorResponseSchema, successResponseSchema } from "@/common/zod-openapi-schema.js";
 
-import { createTaskSchemaReqBody, deleteTaskSchemaReqBody, getTaskRequestPathParamSchema, getTaskSchemaResBody, listTaskSchemaResBody, patchTaskSchemaReqBody } from "./task.schema.js";
+import { createTaskSchema, deleteTaskSchema, getTaskRequestPathParamSchema, taskSchema, taskListSchema, patchTaskSchema } from "./task.schema.js";
 
 export const TaskContract = initContract().router({
   list: {
     method: "GET",
     path: "/",
     responses: {
-      200: listTaskSchemaResBody,
+      200: taskListSchema,
     },
     summary: "Get a list of tasks",
   },
@@ -18,7 +18,7 @@ export const TaskContract = initContract().router({
     path: "/:id",
     pathParams: getTaskRequestPathParamSchema,
     responses: {
-      200: getTaskSchemaResBody,
+      200: taskSchema,
       404: errorResponseSchema,
       422: errorResponseSchema,
     },
@@ -27,10 +27,9 @@ export const TaskContract = initContract().router({
   create: {
     method: "POST",
     path: "/",
-    body: createTaskSchemaReqBody,
+    body: createTaskSchema,
     responses: {
-      200: getTaskSchemaResBody,
-      422: errorResponseSchema,
+      200: taskSchema,
     },
     summary: "Create a task",
   },
@@ -38,9 +37,9 @@ export const TaskContract = initContract().router({
     method: "PATCH",
     path: "/:id",
     pathParams: getTaskRequestPathParamSchema,
-    body: patchTaskSchemaReqBody,
+    body: patchTaskSchema,
     responses: {
-      200: getTaskSchemaResBody,
+      200: taskSchema,
       404: errorResponseSchema,
       422: errorResponseSchema,
     },
@@ -50,7 +49,7 @@ export const TaskContract = initContract().router({
     method: "DELETE",
     path: "/:id",
     pathParams: getTaskRequestPathParamSchema,
-    body: deleteTaskSchemaReqBody,
+    body: deleteTaskSchema,
     responses: {
       204: successResponseSchema,
     },
@@ -58,4 +57,6 @@ export const TaskContract = initContract().router({
   },
 }, {
   pathPrefix: "/tasks",
-});
+    tags: ["tasks"],
+  },
+);
