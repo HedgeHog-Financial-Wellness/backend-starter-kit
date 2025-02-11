@@ -41,12 +41,6 @@ importers:
       express:
         specifier: ^4.21.2
         version: 4.21.2
-      express-serve-static-core:
-        specifier: ^0.1.1
-        version: 0.1.1
-      express-zod-api:
-        specifier: ^22.6.0
-        version: 22.6.0(@types/express@5.0.0)(@types/http-errors@2.0.4)(@types/node@20.17.16)(express@4.21.2)(http-errors@2.0.0)(typescript@5.7.3)(zod@3.24.1)
       helmet:
         specifier: ^8.0.0
         version: 8.0.0
@@ -71,9 +65,6 @@ importers:
       swagger-ui-express:
         specifier: ^5.0.1
         version: 5.0.1(express@4.21.2)
-      typescript:
-        specifier: ^5.7.3
-        version: 5.7.3
       zod:
         specifier: ^3.24.1
         version: 3.24.1
@@ -126,6 +117,9 @@ importers:
       tsx:
         specifier: ^4.19.2
         version: 4.19.2
+      typescript:
+        specifier: ^5.7.3
+        version: 5.7.3
       vitest:
         specifier: ^3.0.5
         version: 3.0.5(@types/debug@4.1.12)(@types/node@20.17.16)(@vitest/ui@3.0.5)(tsx@4.19.2)(yaml@2.7.0)
@@ -1299,10 +1293,6 @@ packages:
     resolution: {integrity: sha512-bN798gFfQX+viw3R7yrGWRqnrN2oRkEkUjjl4JNn4E8GxxbjtG3FbrEIIY3l8/hrwUwIeCZvi4QuOTP4MErVug==}
     engines: {node: '>=12'}
 
-  ansis@3.10.0:
-    resolution: {integrity: sha512-hxDKLYT7hy3Y4sF3HxI926A3urzPxi73mZBB629m9bCVF+NyKNxbwCqqm+C/YrGPtxLwnl6d8/ZASCsz6SyvJA==}
-    engines: {node: '>=16'}
-
   any-promise@1.3.0:
     resolution: {integrity: sha512-7UvmKalWRt1wgjL1RrGxoSJW/0QZFIegpeGvZG9kjp8vrRu55XTHbwnqq2GpXm9uLbcuhxm3IqX9OB4MZR1b2A==}
 
@@ -1535,10 +1525,6 @@ packages:
   delayed-stream@1.0.0:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
-
-  depd@1.1.2:
-    resolution: {integrity: sha512-7emPTl6Dpo6JRXOXjLRxck+FlLRX5847cLKEn00PLAgc3g2hTZZgr+e4c2v6QpSmLeFP3n5yUo7ft6avBK/5jQ==}
-    engines: {node: '>= 0.6'}
 
   depd@2.0.0:
     resolution: {integrity: sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==}
@@ -1982,37 +1968,6 @@ packages:
   expect-type@1.1.0:
     resolution: {integrity: sha512-bFi65yM+xZgk+u/KRIpekdSYkTB5W1pEf0Lt8Q8Msh7b+eQ7LXVtIB1Bkm4fvclDEL1b2CZkMhv2mOeF8tMdkA==}
     engines: {node: '>=12.0.0'}
-
-  express-serve-static-core@0.1.1:
-    resolution: {integrity: sha512-phQFPo1vVwBLOjDq+EspUY6PpWZIs/s62Lvu6QuReViQ9j9ANBnMqPBRwdxs3zxNmpMJ9KBKrmMqCjMwHnGRyQ==}
-
-  express-zod-api@22.6.0:
-    resolution: {integrity: sha512-v2yhovExz6femqUrEGScIWf1K8FfBGPeUH7NClneLkQWfX/Spiw26OQU1qxyZT8lArm72mZMBiSl7ZIugyjHag==}
-    engines: {node: ^20.9.0 || ^22.0.0}
-    peerDependencies:
-      '@types/compression': ^1.7.5
-      '@types/express': ^4.17.13 || ^5.0.0
-      '@types/express-fileupload': ^1.5.0
-      '@types/http-errors': ^2.0.2
-      compression: ^1.7.4
-      express: ^4.21.1 || 5.0.1
-      express-fileupload: ^1.5.0
-      http-errors: ^2.0.0
-      typescript: ^5.1.3
-      zod: ^3.23.0
-    peerDependenciesMeta:
-      '@types/compression':
-        optional: true
-      '@types/express':
-        optional: true
-      '@types/express-fileupload':
-        optional: true
-      '@types/http-errors':
-        optional: true
-      compression:
-        optional: true
-      express-fileupload:
-        optional: true
 
   express@4.21.2:
     resolution: {integrity: sha512-28HqgMZAmih1Czt9ny7qr6ek2qddF4FclbMzwhCREB6OFfH+rXAnuNCwo1/wFvrtbgsQDb4kSbX9de9lFbrXnA==}
@@ -2561,18 +2516,6 @@ packages:
     resolution: {integrity: sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==}
     engines: {node: '>= 0.6'}
 
-  node-mocks-http@1.16.2:
-    resolution: {integrity: sha512-2Sh6YItRp1oqewZNlck3LaFp5vbyW2u51HX2p1VLxQ9U/bG90XV8JY9O7Nk+HDd6OOn/oV3nA5Tx5k4Rki0qlg==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      '@types/express': ^4.17.21 || ^5.0.0
-      '@types/node': '*'
-    peerDependenciesMeta:
-      '@types/express':
-        optional: true
-      '@types/node':
-        optional: true
-
   node-releases@2.0.19:
     resolution: {integrity: sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw==}
 
@@ -2860,9 +2803,6 @@ packages:
 
   quick-format-unescaped@4.0.4:
     resolution: {integrity: sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==}
-
-  ramda@0.30.1:
-    resolution: {integrity: sha512-tEF5I22zJnuclswcZMc8bDIrwRHRzf+NqVEmqg50ShAZMP7MWeR/RGDthfM/p+BlqvF2fXAzpn8i+SJcYD3alw==}
 
   range-parser@1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
@@ -4387,8 +4327,6 @@ snapshots:
 
   ansi-styles@6.2.1: {}
 
-  ansis@3.10.0: {}
-
   any-promise@1.3.0: {}
 
   are-docs-informative@0.0.2: {}
@@ -4584,8 +4522,6 @@ snapshots:
   deep-is@0.1.4: {}
 
   delayed-stream@1.0.0: {}
-
-  depd@1.1.2: {}
 
   depd@2.0.0: {}
 
@@ -5108,24 +5044,6 @@ snapshots:
   etag@1.8.1: {}
 
   expect-type@1.1.0: {}
-
-  express-serve-static-core@0.1.1: {}
-
-  express-zod-api@22.6.0(@types/express@5.0.0)(@types/http-errors@2.0.4)(@types/node@20.17.16)(express@4.21.2)(http-errors@2.0.0)(typescript@5.7.3)(zod@3.24.1):
-    dependencies:
-      ansis: 3.10.0
-      express: 4.21.2
-      http-errors: 2.0.0
-      node-mocks-http: 1.16.2(@types/express@5.0.0)(@types/node@20.17.16)
-      openapi3-ts: 4.4.0
-      ramda: 0.30.1
-      typescript: 5.7.3
-      zod: 3.24.1
-    optionalDependencies:
-      '@types/express': 5.0.0
-      '@types/http-errors': 2.0.4
-    transitivePeerDependencies:
-      - '@types/node'
 
   express@4.21.2:
     dependencies:
@@ -5822,22 +5740,6 @@ snapshots:
 
   negotiator@0.6.3: {}
 
-  node-mocks-http@1.16.2(@types/express@5.0.0)(@types/node@20.17.16):
-    dependencies:
-      accepts: 1.3.8
-      content-disposition: 0.5.4
-      depd: 1.1.2
-      fresh: 0.5.2
-      merge-descriptors: 1.0.3
-      methods: 1.1.2
-      mime: 1.6.0
-      parseurl: 1.3.3
-      range-parser: 1.2.1
-      type-is: 1.6.18
-    optionalDependencies:
-      '@types/express': 5.0.0
-      '@types/node': 20.17.16
-
   node-releases@2.0.19: {}
 
   normalize-package-data@2.5.0:
@@ -6112,8 +6014,6 @@ snapshots:
   queue-microtask@1.2.3: {}
 
   quick-format-unescaped@4.0.4: {}
-
-  ramda@0.30.1: {}
 
   range-parser@1.2.1: {}
 
