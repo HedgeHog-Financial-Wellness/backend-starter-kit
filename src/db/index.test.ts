@@ -1,7 +1,10 @@
-import { describe, it, expect } from "vitest";
-import db from "./index.js";
+import type { drizzle } from "drizzle-orm/node-postgres";
+
 import { sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/node-postgres";
+import { describe, expect, it } from "vitest";
+
+import db from "./index.js";
+
 describe("db", () => {
   it("db should not be null", async () => {
     expect(db.db).not.toBeNull();
@@ -14,11 +17,10 @@ describe("db", () => {
   });
 });
 
-
-const dbVersionHelper = async (db: ReturnType<typeof drizzle>): Promise<string> => {
+async function dbVersionHelper(db: ReturnType<typeof drizzle>): Promise<string> {
   const result = await db.execute(sql`SELECT version() as version`);
   if (result.rows.length === 0 || !result.rows[0].version) {
     throw new Error("db version not found");
   }
   return result.rows[0].version as string;
-};
+}

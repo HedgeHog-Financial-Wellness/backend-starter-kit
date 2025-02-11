@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 
 export default {
   resolve: {
@@ -7,4 +7,3 @@ export default {
     },
   },
 };
-

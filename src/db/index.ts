@@ -9,7 +9,8 @@ const errDatabaseVersionNotFound = new Error("Database version not found");
 async function queryVersion(db: ReturnType<typeof drizzle>): Promise<string> {
   const result = await db.execute(versionQuery);
   const version = result.rows[0]?.version;
-  if (typeof version !== "string") throw errDatabaseVersionNotFound;
+  if (typeof version !== "string")
+    throw errDatabaseVersionNotFound;
   return version;
 }
 
@@ -19,8 +20,10 @@ function dbInstance(url: string) {
   let connecting: Promise<ReturnType<typeof drizzle>> | null = null;
 
   const connect = async () => {
-    if (db) return db;
-    if (connecting) return connecting;
+    if (db)
+      return db;
+    if (connecting)
+      return connecting;
 
     connecting = (async () => {
       pool = new pg.Pool({ connectionString: url });
@@ -28,9 +31,11 @@ function dbInstance(url: string) {
 
       try {
         const version = await queryVersion(db);
+        // eslint-disable-next-line no-console
         console.log(`database connected, version: ${version}`);
         return db;
-      } catch (error) {
+      }
+      catch (error) {
         await pool.end();
         throw error;
       }
@@ -44,6 +49,8 @@ function dbInstance(url: string) {
       await pool.end();
       pool = null;
       db = null;
+
+      // eslint-disable-next-line no-console
       console.log("database disconnected");
     }
   };
@@ -51,8 +58,10 @@ function dbInstance(url: string) {
   return { connect, disconnect };
 }
 
+// eslint-disable-next-line node/no-process-env
 const databaseUrl = process.env.DATABASE_URL;
-if (!databaseUrl) throw new Error("DATABASE_URL environment variable is not set");
+if (!databaseUrl)
+  throw new Error("DATABASE_URL environment variable is not set");
 
 const dbInst = dbInstance(databaseUrl);
 const db = await dbInst.connect();

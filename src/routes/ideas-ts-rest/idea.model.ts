@@ -1,9 +1,12 @@
+import type { drizzle } from "drizzle-orm/node-postgres";
 import type { z } from "zod";
-import { ideasTable } from "@/db/schema/ideas.js";
-import { listIdeaSchemaResBody, getIdeaSchemaResBody } from "./ideas.schema.js";
-import { drizzle } from "drizzle-orm/node-postgres";
-import type { IdeaRepository } from "./idea.repository.js";
+
 import { eq } from "drizzle-orm";
+
+import { ideasTable } from "@/db/schema/ideas.js";
+
+import type { IdeaRepository } from "./idea.repository.js";
+import type { getIdeaSchemaResBody, listIdeaSchemaResBody } from "./ideas.schema.js";
 
 export class IdeaModel implements IdeaRepository {
   constructor(private db: ReturnType<typeof drizzle>) { }

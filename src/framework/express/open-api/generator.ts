@@ -1,11 +1,11 @@
-import { generateOpenApi } from '@ts-rest/open-api';
+import { initContract } from "@ts-rest/core";
+import { generateOpenApi } from "@ts-rest/open-api";
 
-import { TaskContract } from '../../../routes/tasks/task.contract.js';
-import { ideasContract } from '@/routes/ideas-ts-rest/ideas.contract.js';
-import { initContract } from '@ts-rest/core';
+import { ideasContract } from "@/routes/ideas-ts-rest/ideas.contract.js";
 
-export const generateOpenApiDocument = () => {
-  
+import { TaskContract } from "../../../routes/tasks/task.contract.js";
+
+export function generateOpenApiDocument() {
   const contract = initContract().router({
     ...TaskContract,
     ...ideasContract,
@@ -13,8 +13,8 @@ export const generateOpenApiDocument = () => {
 
   return generateOpenApi(contract, {
     info: {
-      title: 'Tasks API',
-      version: '1.0.0',
+      title: "Tasks API",
+      version: "1.0.0",
     },
   });
 }

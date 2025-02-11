@@ -1,6 +1,5 @@
 import { extendZodWithOpenApi } from "@anatine/zod-openapi";
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
-
 import { z } from "zod";
 
 import { tasksTable } from "../../db/schema/tasks.js";
@@ -23,7 +22,7 @@ export const taskListSchema = z.array(taskSchema).openapi({
 
 export const createTaskSchema = createInsertSchema(tasksTable, {
   name: z.string().min(1).max(500),
-  })
+})
   .required({
     name: true,
     done: true,

@@ -5,7 +5,7 @@ import { tasksTable } from "@/db/schema/tasks.js";
 
 import { TaskModel } from "../task.model.js";
 
-const { db, disconnect } = dbInstance;
+const { db } = dbInstance;
 let taskModel: TaskModel;
 const { seedTasks, deleteTasks } = helperFunction();
 

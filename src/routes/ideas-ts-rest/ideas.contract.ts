@@ -1,29 +1,29 @@
+import { initContract } from "@ts-rest/core";
 
-import { initContract } from '@ts-rest/core';
-
-import { listIdeaSchemaResBody, getIdeaRequestSchema, getIdeaSchemaResBody } from "./ideas.schema.js";
 import { errorResponseSchema } from "@/common/zod-openapi-schema.js";
+
+import { getIdeaRequestSchema, getIdeaSchemaResBody, listIdeaSchemaResBody } from "./ideas.schema.js";
 
 export const ideasContract = initContract().router({
   list: {
-    method: 'GET',
+    method: "GET",
     path: `/`,
     responses: {
       200: listIdeaSchemaResBody,
     },
-    summary: 'Get a list of ideas',
+    summary: "Get a list of ideas",
   },
   get: {
-    method: 'GET',
+    method: "GET",
     path: `/:slug`,
     pathParams: getIdeaRequestSchema,
     responses: {
       200: getIdeaSchemaResBody,
       404: errorResponseSchema,
     },
-    summary: 'Get a single idea',
+    summary: "Get a single idea",
   },
 }, {
-  pathPrefix: '/ideas',
+  pathPrefix: "/ideas",
   tags: ["ideas"],
 });

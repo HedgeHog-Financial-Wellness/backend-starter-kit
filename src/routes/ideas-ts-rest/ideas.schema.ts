@@ -1,10 +1,10 @@
-import { z } from "zod";
+import { extendZodWithOpenApi } from "@anatine/zod-openapi";
 import { createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
+
 import { ideasTable } from "../../db/schema/ideas.js";
-import { extendZodWithOpenApi } from '@anatine/zod-openapi';
 
 extendZodWithOpenApi(z);
-
 
 export const getIdeaSchemaResBody = createSelectSchema(ideasTable).omit({
   id: true,
@@ -21,5 +21,3 @@ export const listIdeaSchemaResBody = z.array(getIdeaSchemaResBody).openapi({
   title: "Idea List",
   description: "A list of ideas",
 });
-
-

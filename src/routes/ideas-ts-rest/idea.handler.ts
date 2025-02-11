@@ -1,15 +1,15 @@
-import { type ServerInferResponses, type ServerInferRequest } from "@ts-rest/core";
+import type { ServerInferRequest, ServerInferResponses } from "@ts-rest/core";
 
-import { IdeaService } from "./idea.service.js";
-import { ideasContract } from "./ideas.contract.js";
+import type { IdeaService } from "./idea.service.js";
+import type { ideasContract } from "./ideas.contract.js";
 
-type ResponseShapes = ServerInferResponses<typeof ideasContract>
-type RequestShapes = ServerInferRequest<typeof ideasContract>
+type ResponseShapes = ServerInferResponses<typeof ideasContract>;
+type RequestShapes = ServerInferRequest<typeof ideasContract>;
 
 export class IdeaHandler {
   constructor(private ideaService: IdeaService) {}
 
-  async listIdeas(): Promise<ResponseShapes['list']> {
+  async listIdeas(): Promise<ResponseShapes["list"]> {
     const ideas = await this.ideaService.listIdeas();
 
     return {
@@ -18,7 +18,7 @@ export class IdeaHandler {
     };
   }
 
-  async getIdea(request: RequestShapes['get']): Promise<ResponseShapes['get']> {
+  async getIdea(request: RequestShapes["get"]): Promise<ResponseShapes["get"]> {
     const slug = request.params.slug;
     const idea = await this.ideaService.getIdea(slug);
     if (!idea) {

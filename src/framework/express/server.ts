@@ -1,3 +1,4 @@
+import dbInstance from "@/db/index.js";
 import env from "@/env.js";
 import { configureIdeasEndpoints } from "@/routes/ideas-ts-rest/index.js";
 import { configureTasksEndpoints } from "@/routes/tasks/tasks.index.js";
@@ -6,7 +7,6 @@ import { systemLogger } from "@/utils/logger.js";
 import { createApp } from "./app.js";
 import configureOpenAPI from "./open-api/configure.js";
 import { handleSignals } from "./signal.js";
-import dbInstance from "@/db/index.js";
 
 export async function main() {
   systemLogger.info("resolving dependencies");

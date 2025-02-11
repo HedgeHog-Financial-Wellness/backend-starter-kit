@@ -1,7 +1,7 @@
 import type { z } from "zod";
 
 import type { IdeaRepository } from "./idea.repository.js";
-import { getIdeaSchemaResBody, listIdeaSchemaResBody } from "./ideas.schema.js";
+import type { getIdeaSchemaResBody, listIdeaSchemaResBody } from "./ideas.schema.js";
 
 export class IdeaService {
   constructor(private ideaRepository: IdeaRepository) {}

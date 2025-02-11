@@ -2,7 +2,7 @@ import { initContract } from "@ts-rest/core";
 
 import { errorResponseSchema, successResponseSchema } from "@/common/zod-openapi-schema.js";
 
-import { createTaskSchema, deleteTaskSchema, getTaskRequestPathParamSchema, taskSchema, taskListSchema, patchTaskSchema } from "./task.schema.js";
+import { createTaskSchema, deleteTaskSchema, getTaskRequestPathParamSchema, patchTaskSchema, taskListSchema, taskSchema } from "./task.schema.js";
 
 export const TaskContract = initContract().router({
   list: {
@@ -57,6 +57,5 @@ export const TaskContract = initContract().router({
   },
 }, {
   pathPrefix: "/tasks",
-    tags: ["tasks"],
-  },
-);
+  tags: ["tasks"],
+});
